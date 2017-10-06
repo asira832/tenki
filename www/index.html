@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+    
+    var ken="";
+    var html="";
+
+            //天気データを取得
+            function tenki_get(button){
+                //Id値の取得
+                ken = $(button).attr("id");
+                //Ajax通信
+                $.ajax({
+                    url: "http://javascriptajax.azurewebsites.net/get_tenki.php?city="+ken,//Id値でファイル名を指定
+                    type:'GET',
+                    dataType: 'xml',
+                }).done(function(data){
+                    //成功処理
+                    //alert("受信成功");
+                    //テキストの初期化
+                    $("#kekka").text("");
+                    //テキストの参照、表示
+                    $("#kekka").text($(data).find("description:eq(0)").text());
+                        var i=2;
+                        //htmlの初期化
+                        html="";
+                        //天気データの取り出し
+                        while(i<=9){
+                            //データの参照
+                            var url = $(data).find("url:eq("+i+")").text();
+                            var text = $(data).find("description:eq("+i+")").text();
+                            //テーブルの作成
+                            html+="<td>";
+                            html+="<img src='"+url+"'>";
+                            html+="</td>";
+                            html+="<td>";
+                            html+="<p>"+text+"</p>"
+                            html+="</td><br>";
+
+                            i++;
+                        }
+                        //天気データの表示
+                        $("#tenki").html(html);
+
+   
+                }).fail(function(data){
+                    //失敗処理
+                    alert("受信失敗");
+
+                });
+
+
+            }
+
+            $(function(){
+                $("input").on("click",function(){
+                    tenki_get($(this));
+                })
+            });
+    </script>
+</head>
+<body>
+    <h1>天気予報</h1>
+        <table>
+            <tr>
+                <td><input type="button" value="愛媛県" id="380010"/></td>
+                <td><input type="button" value="香川県" id="370000"/></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="高知県" id="390010"/></td>
+                <td><input type="button" value="徳島県" id="360010"/></td>
+            </tr>
+        </table>
+    <p id="kekka"></p>
+    <table id="tenki"></table>
+</body>
+</html>
